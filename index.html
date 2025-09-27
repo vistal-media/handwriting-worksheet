@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwriting Worksheet Generator</title>
+    <style>
+        /* Multiple handwriting font options */
+        @import url('https://fonts.googleapis.com/css2?family=Playwrite+CL+Guides:wght@100..400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Handlee&display=swap');
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        textarea, input, select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        textarea:focus, input:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        .settings-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .settings-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .worksheet {
+            background: white;
+            padding: 40px;
+            margin-top: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+        
+        .worksheet-line {
+            font-family: 'Dancing Script', 'Caveat', 'Kalam', 'Patrick Hand', cursive;
+            margin-bottom: 30px;
+            position: relative;
+            line-height: 1.5;
+            border-bottom: 2px dotted #ccc;
+            padding-bottom: 10px;
+            color: #666;
+            font-weight: 400;
+        }
+        
+        .practice-line {
+            border-bottom: 2px solid #e0e0e0;
+            height: 50px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .practice-line::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #f0f0f0;
+            border-top: 1px dashed #ccc;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .container:first-child {
+                display: none;
+            }
+            
+            .worksheet {
+                box-shadow: none;
+                padding: 20px;
+                margin: 0;
+            }
+            
+            .worksheet-line {
+                color: #999;
+            }
+        }
+        
+        .print-button {
+            background: #2196F3;
+            margin-left: 10px;
+        }
+        
+        .print-button:hover {
+            background: #1976D2;
+        }
+        
+        .preview-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✏️ Handwriting Worksheet Generator</h1>
+        
+        <div class="controls">
+            <div class="input-group">
+                <label for="text-input">Enter words, phrases, or sentences:</label>
+                <textarea id="text-input" placeholder="Enter text here... Each line will become a separate practice line.
+
+Examples:
+- Single words: cat, dog, house
+- Phrases: my favorite color
+- Sentences: The quick brown fox jumps over the lazy dog."></textarea>
+                <div class="preview-text">Tip: Each line you type will become a separate practice line on the worksheet.</div>
+            </div>
+            
+            <div class="settings-row">
+                <div class="input-group">
+                    <label for="font-family">Font Style:</label>
+                    <select id="font-family">
+                        <option value="'Dancing Script', cursive">Dancing Script (Cursive)</option>
+                        <option value="'Caveat', cursive">Caveat (Handwritten)</option>
+                        <option value="'Kalam', cursive">Kalam (Casual)</option>
+                        <option value="'Patrick Hand', cursive">Patrick Hand</option>
+                        <option value="'Architects Daughter', cursive">Architects Daughter</option>
+                        <option value="'Handlee', cursive">Handlee</option>
+                        <option value="'Playwrite CL Guides', cursive">Playwrite CL (Print)</option>
+                        <option value="cursive">System Cursive</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="font-size">Font Size:</label>
+                    <select id="font-size">
+                        <option value="24">24px - Small</option>
+                        <option value="32" selected>32px - Medium</option>
+                        <option value="40">40px - Large</option>
+                        <option value="48">48px - Extra Large</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="practice-lines">Practice Lines per Item:</label>
+                    <select id="practice-lines">
+                        <option value="1">1 line</option>
+                        <option value="2" selected>2 lines</option>
+                        <option value="3">3 lines</option>
+                        <option value="4">4 lines</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="settings-row">
+                <div class="input-group">
+                    <label for="line-spacing">Line Spacing:</label>
+                    <select id="line-spacing">
+                        <option value="tight">Tight</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="loose">Loose</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="show-example">Show Example:</label>
+                    <select id="show-example">
+                        <option value="true" selected>Yes</option>
+                        <option value="false">No (practice lines only)</option>
+                    </select>
+                </div>
+                
+                <div style="opacity: 0;"></div> <!-- Spacer -->
+            </div>
+            
+            <div style="text-align: center;">
+                <button onclick="generateWorksheet()">Generate Worksheet</button>
+                <button class="print-button" onclick="window.print()">Print Worksheet</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="worksheet" id="worksheet">
+        <p style="text-align: center; color: #999; font-style: italic;">
+            Enter some text above and click "Generate Worksheet" to create your handwriting practice sheet!
+        </p>
+    </div>
+
+    <script>
+        function generateWorksheet() {
+            const textInput = document.getElementById('text-input').value.trim();
+            const fontSize = document.getElementById('font-size').value;
+            const fontFamily = document.getElementById('font-family').value;
+            const practiceLines = parseInt(document.getElementById('practice-lines').value);
+            const lineSpacing = document.getElementById('line-spacing').value;
+            const showExample = document.getElementById('show-example').value === 'true';
+            const worksheet = document.getElementById('worksheet');
+            
+            if (!textInput) {
+                worksheet.innerHTML = '<p style="text-align: center; color: #999; font-style: italic;">Please enter some text to generate a worksheet.</p>';
+                return;
+            }
+            
+            // Split input by lines and filter out empty lines
+            const lines = textInput.split('\n').filter(line => line.trim());
+            
+            let worksheetHTML = '';
+            
+            // Set spacing based on selection
+            let spacing = '30px';
+            if (lineSpacing === 'tight') spacing = '20px';
+            else if (lineSpacing === 'loose') spacing = '40px';
+            
+            lines.forEach(line => {
+                const trimmedLine = line.trim();
+                if (trimmedLine) {
+                    // Add the example line in the handwriting font (if enabled)
+                    if (showExample) {
+                        worksheetHTML += `
+                            <div class="worksheet-line" style="font-family: ${fontFamily}; font-size: ${fontSize}px; margin-bottom: ${spacing};">
+                                ${trimmedLine}
+                            </div>
+                        `;
+                    }
+                    
+                    // Add practice lines
+                    for (let i = 0; i < practiceLines; i++) {
+                        worksheetHTML += `<div class="practice-line" style="margin-bottom: ${spacing};"></div>`;
+                    }
+                }
+            });
+            
+            worksheet.innerHTML = worksheetHTML;
+        }
+        
+        // Generate initial worksheet with example text
+        document.getElementById('text-input').value = 'The quick brown fox\nPractice makes perfect\nHandwriting is fun';
+        generateWorksheet();
+        
+        // Auto-generate when any setting changes
+        document.getElementById('text-input').addEventListener('input', generateWorksheet);
+        document.getElementById('font-size').addEventListener('change', generateWorksheet);
+        document.getElementById('font-family').addEventListener('change', generateWorksheet);
+        document.getElementById('practice-lines').addEventListener('change', generateWorksheet);
+        document.getElementById('line-spacing').addEventListener('change', generateWorksheet);
+        document.getElementById('show-example').addEventListener('change', generateWorksheet);
+    </script>
+</body>
+</html>
